@@ -25,7 +25,7 @@ class xml2tree():
         index = index[:] if index else []
         if len(root) > 0:
             for i, child in enumerate(root):
-                #self.print_log(print_adv(child.tag, index, level))
+                self.print_log(print_adv(child.tag, index, level))
                 if child.tag == 'Affiliation':
                     rtrn = check_email(child.text)
                     if rtrn is not None:
@@ -34,7 +34,7 @@ class xml2tree():
                         self.cnt += 1
                 self.parse(child, level + 1, tag + [child.tag], index + [i])
         else:
-            #self.print_log(print_adv(root.text, index, level))
+            self.print_log(print_adv(root.text, index, level))
             pass
 
     def save_csv(self):
