@@ -42,7 +42,7 @@ class print_logger():
         self.csv.close()
 
 class xml2tree():
-    def __init__(self, xml_file='D:/9_Github/5_Taaniel_Git/Data/pubmed_result2.xml'):
+    def __init__(self, xml_file='Data/pubmed_result2.xml'):
         tree = ET.parse(xml_file)
         self.root = tree.getroot()
         self.index_lst = []
