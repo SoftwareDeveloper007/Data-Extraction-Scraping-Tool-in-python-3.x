@@ -8,10 +8,10 @@ class print_logger():
         curDate = date.today()
 
         #------------- 'already-extracted.csv' ------------------------------------------------------------------------------
-        self.alreadyExtracted = open("already-extracted" + "_" + str(curDate) + ".txt", "w", encoding="utf-16")
+        self.alreadyExtracted = open("already-extracted" + ".txt", "a", encoding="utf-16")
 
         #------------- 'ignore.csv' -----------------------------------------------------------------------------------------
-        self.ignore = open("ignore" + "_" + str(curDate) + ".txt", "w", encoding="utf-16")
+        self.ignore = open("ignore" + ".txt", "a", encoding="utf-16")
 
         #------------- 'Log_File_.txt' --------------------------------------------------------------------------------------
         self.logFile = open("Log_File_"+str(curDate)+".txt", "w", encoding='utf-16')
@@ -53,14 +53,9 @@ class print_logger():
         self.logFile.close()
         self.csv.close()
 
-<<<<<<< HEAD
 class main():
     def __init__(self, xml_file='Data/pubmed_result.xml'):
         # convert xml file to tree
-=======
-class xml2tree():
-    def __init__(self, xml_file='Data/pubmed_result2.xml'):
->>>>>>> f39445f57072fadab06db6171e8b695ab31768f6
         tree = ET.parse(xml_file)
         # get root of tree
         self.root = tree.getroot()
