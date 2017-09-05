@@ -53,9 +53,14 @@ class print_logger():
         self.logFile.close()
         self.csv.close()
 
+<<<<<<< HEAD
 class main():
     def __init__(self, xml_file='Data/pubmed_result.xml'):
         # convert xml file to tree
+=======
+class xml2tree():
+    def __init__(self, xml_file='Data/pubmed_result2.xml'):
+>>>>>>> f39445f57072fadab06db6171e8b695ab31768f6
         tree = ET.parse(xml_file)
         # get root of tree
         self.root = tree.getroot()
