@@ -2,56 +2,59 @@ import xml.etree.ElementTree as ET
 from datetime import date
 import csv, time
 
-#--------------- Print and Save all log data --------------------------------------------------------------------------------
+
+# --------------- Print and Save all log data --------------------------------------------------------------------------------
 class print_logger():
     def __init__(self):
         curDate = date.today()
 
-        #------------- 'already-extracted.csv' ------------------------------------------------------------------------------
+        # ------------- 'already-extracted.csv' ------------------------------------------------------------------------------
         self.alreadyExtracted = open("already-extracted" + ".txt", "a", encoding="utf-16")
 
-        #------------- 'ignore.csv' -----------------------------------------------------------------------------------------
+        # ------------- 'ignore.csv' -----------------------------------------------------------------------------------------
         self.ignore = open("ignore" + ".txt", "a", encoding="utf-16")
 
-        #------------- 'Log_File_.txt' --------------------------------------------------------------------------------------
-        self.logFile = open("Log_File_"+str(curDate)+".txt", "w", encoding='utf-16')
+        # ------------- 'Log_File_.txt' --------------------------------------------------------------------------------------
+        self.logFile = open("Log_File_" + str(curDate) + ".txt", "w", encoding='utf-16')
 
-        #------------- 'result_.csv' ----------------------------------------------------------------------
-        self.csv = open("result_"+str(curDate)+".csv", 'w', encoding='utf-16', newline='')
+        # ------------- 'result_.csv' ----------------------------------------------------------------------
+        self.csv = open("result_" + str(curDate) + ".csv", 'w', encoding='utf-16', newline='')
         self.writer = csv.writer(self.csv)
-        headers = ['Last Name', 'Fore Name', 'Email', 'Article Title', 'Article ID', 'Journal Title', 'Date', 'Keywordlist']
+        headers = ['Last Name', 'Fore Name', 'Email', 'Article Title', 'Article ID', 'Journal Title', 'Date',
+                   'Keywordlist']
 
         self.writer.writerow(headers)
 
-    #------------- Write emails list to 'already_extract.txt' ---------------------------------------------------------------
+    # ------------- Write emails list to 'already_extract.txt' ---------------------------------------------------------------
     def print_alreadyExtracted(self, emails):
         for email in emails:
             self.alreadyExtracted.write(email + '\n')
         self.alreadyExtracted.flush()
 
-    #------------- Write emails list to 'ignore.txt' ------------------------------------------------------------------------
+    # ------------- Write emails list to 'ignore.txt' ------------------------------------------------------------------------
     def print_ignore(self, emails):
         for email in emails:
             self.ignore.write(email + '\n')
         self.ignore.flush()
 
-    #------------- Write log of process to 'Log_File_.txt' ------------------------------------------------------------------
+    # ------------- Write log of process to 'Log_File_.txt' ------------------------------------------------------------------
     def print_log(self, logTxt):
         self.logFile.write(logTxt + '\n')
         self.logFile.flush()
         print(logTxt)
 
-    #-------------- Save data to csv file -----------------------------------------------------------------------------------
+    # -------------- Save data to csv file -----------------------------------------------------------------------------------
     def print_csv(self, dt):
         for i, row in enumerate(dt):
             self.writer.writerow(row)
 
-    #-------------- Close all files -----------------------------------------------------------------------------------------
+    # -------------- Close all files -----------------------------------------------------------------------------------------
     def close_all(self):
         self.alreadyExtracted.close()
         self.ignore.close()
         self.logFile.close()
         self.csv.close()
+
 
 class main():
     def __init__(self, xml_file='Data/pubmed_result.xml'):
@@ -73,17 +76,17 @@ class main():
         self.logger.print_log(logTxt)
 
         # initialize self.alreadyExtracted, self.ignore, self.totalData
-        self.alreadyExtracted = []      # store all already extracted emails
-        self.ignore = []                # store all ingored emails
-        self.totalData = []             # store all extracted data
+        self.alreadyExtracted = []  # store all already extracted emails
+        self.ignore = []  # store all ingored emails
+        self.totalData = []  # store all extracted data
 
-    #------ checks and finds if there is email using recursing repeation ----------------------------------------------------
+    # ------ checks and finds if there is email using recursing repeation ----------------------------------------------------
     def findEmail(self, root, level=0, tag=None, index=None):
         tag = tag[:] if tag else []
         index = index[:] if index else []
         if len(root) > 0:
             for i, child in enumerate(root):
-                #self.logger.print_log(print_adv(child.tag, index, level))
+                # self.logger.print_log(print_adv(child.tag, index, level))
                 # if tag name is 'Affiliation', check if there is email.
                 # If there is email, append the index into self.index_lst
                 if child.tag == 'Affiliation':
@@ -94,18 +97,18 @@ class main():
                         self.cnt += 1
                 self.findEmail(child, level + 1, tag + [child.tag], index + [i])
         else:
-            #self.logger.print_log(print_adv(root.text, index, level))
+            # self.logger.print_log(print_adv(root.text, index, level))
             pass
 
-    #------- Extract all necessary data based on the result of email checks --------------------------------------------------
+    # ------- Extract all necessary data based on the result of email checks --------------------------------------------------
     def extractData(self):
         for i, index in enumerate(self.index_lst):
             try:
-                Email = self.email_lst[i].strip('.') #eliminate unnecessary '.' from email
+                Email = self.email_lst[i].strip('.')  # eliminate unnecessary '.' from email
                 # eliminate 'email:' or 'Email:' if it is contained in email
-                if 'email:' in Email: # if 'email:' is contained in Email, 'email:' is eliminated
+                if 'email:' in Email:  # if 'email:' is contained in Email, 'email:' is eliminated
                     Email = Email.replace('email:', '')
-                if 'Email:' in Email: # if 'Email:' is contained in Email, 'email:' is eliminated
+                if 'Email:' in Email:  # if 'Email:' is contained in Email, 'email:' is eliminated
                     Email = Email.replace('Email:', '')
             except:
                 Email = ''
@@ -117,12 +120,12 @@ class main():
                 if Email not in self.ignore:
                     self.ignore.append(Email)
                 continue
-            else: # if Email is not in self.alreadyExtracted, it is appended into self.alreadyExtracted
+            else:  # if Email is not in self.alreadyExtracted, it is appended into self.alreadyExtracted
                 self.alreadyExtracted.append(Email)
 
             # Last Name
             try:
-                LastName = select_elm(self.root, index[:-1]+[0]).text
+                LastName = select_elm(self.root, index[:-1] + [0]).text
             except:
                 LastName = ''
 
@@ -134,25 +137,25 @@ class main():
 
             # Article Title
             try:
-                ArticleTitle = select_elm(self.root, index[:-3]+[1]).text
+                ArticleTitle = select_elm(self.root, index[:-3] + [1]).text
             except:
                 ArticleTitle = ''
 
             # Journal Title
             try:
-                JournalTitle = select_elm(self.root, index[:-3]+[0,2]).text
+                JournalTitle = select_elm(self.root, index[:-3] + [0, 2]).text
             except:
                 JournalTitle = ''
 
             # Article ID
             ArticleID = ''
-            for elm in select_elm(self.root, [index[0]] + [1,2]):
+            for elm in select_elm(self.root, [index[0]] + [1, 2]):
                 if elm.attrib['IdType'] == 'doi':
                     ArticleID = elm.text
                     break
 
             # Year, Month, Day
-            for elm in select_elm(self.root, [index[0]]+[1,0]):
+            for elm in select_elm(self.root, [index[0]] + [1, 0]):
                 if elm.attrib['PubStatus'] == 'pubmed':
                     try:
                         Year = elm[0].text
@@ -177,16 +180,20 @@ class main():
                     break
 
             # print extracted data
+            year_month_day = str(date(int(Year), int(Month), int(Day))).split('-')
+            yearStr = year_month_day[0]
+            monthStr = year_month_day[1]
+            dayStr = year_month_day[2]
             pTxt = '\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~' \
                    '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n' \
                    '\nLastName:\t\t{0}\nForeName:\t\t{1}\nEmail:\t\t\t{2}\nArticleTitle:\t\t{3}\nArticleID:\t\t{4}\n' \
-                   'JournalTitle:\t\t{5}\nDate:\t\t\t{6}\nKeywordList:\t\t{7}'\
+                   'JournalTitle:\t\t{5}\nDate:\t\t\t{6}{7}{8}\nKeywordList:\t\t{9}' \
                 .format(LastName, ForeName, Email, ArticleTitle, ArticleID, JournalTitle,
-                        str(date(int(Year),int(Month),int(Day))), ', '.join(KeywordList))
+                        yearStr, monthStr, dayStr, ', '.join(KeywordList))
             self.logger.print_log(pTxt)
 
             self.totalData.append([LastName, ForeName, Email, ArticleTitle, ArticleID, JournalTitle,
-                                   str(date(int(Year),int(Month),int(Day))), " , ".join(KeywordList)])
+                                   yearStr + monthStr + dayStr, " , ".join(KeywordList)])
 
     # Save all relevant emails and process of run, and then close all files.
     def saveData(self):
@@ -195,11 +202,13 @@ class main():
         self.logger.print_csv(self.totalData)
         self.logger.close_all()
 
+
 # It is used for printing tree structure visually
 def print_adv(tag, index, level):
     index_str = ','.join(str(i) for i in index)
-    pTxt = "{0}├──{1}({2})".format('\t'*level, tag, index_str)
+    pTxt = "{0}├──{1}({2})".format('\t' * level, tag, index_str)
     return pTxt
+
 
 # check if it is email or not
 def check_email(line):
@@ -211,12 +220,14 @@ def check_email(line):
 
     return None
 
+
 # select element from node by using index list
 def select_elm(node, index):
     result = node
     for i in index:
         result = result[i]
     return result
+
 
 if __name__ == '__main__':
     start_time = time.time()
